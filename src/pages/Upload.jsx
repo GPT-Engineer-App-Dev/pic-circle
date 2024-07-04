@@ -1,16 +1,45 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+
+const uploadPhoto = async (data) => {
+  const formData = new FormData();
+  formData.append("photo", data.photo[0]);
+  formData.append("caption", data.caption);
+  formData.append("tags", data.tags);
+
+  const response = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to upload photo");
+  }
+
+  return response.json();
+};
 
 const UploadPage = () => {
+  const queryClient = useQueryClient();
   const { register, handleSubmit, reset } = useForm();
   const [image, setImage] = useState(null);
 
+  const mutation = useMutation(uploadPhoto, {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["photos"]);
+      toast("Photo uploaded successfully!");
+      reset();
+      setImage(null);
+    },
+    onError: () => {
+      toast.error("Failed to upload photo");
+    },
+  });
+
   const onSubmit = (data) => {
-    console.log(data);
-    reset();
+    mutation.mutate(data);
   };
 
   const handleImageChange = (e) => {
@@ -46,7 +75,9 @@ const UploadPage = () => {
         </label>
         <Input id="tags" {...register("tags")} />
       </div>
-      <Button type="submit">Upload</Button>
+      <Button type="submit" disabled={mutation.isLoading}>
+        {mutation.isLoading ? "Uploading..." : "Upload"}
+      </Button>
     </form>
   );
 };

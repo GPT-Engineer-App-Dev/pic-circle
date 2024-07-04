@@ -4,21 +4,11 @@ import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle } from "lucide-react";
 
 const fetchPhotos = async () => {
-  // Replace with actual API call
-  return [
-    {
-      id: 1,
-      username: "user1",
-      photoUrl: "https://via.placeholder.com/150",
-      postedAt: "2 hours ago",
-    },
-    {
-      id: 2,
-      username: "user2",
-      photoUrl: "https://via.placeholder.com/150",
-      postedAt: "5 hours ago",
-    },
-  ];
+  const response = await fetch("/api/photos");
+  if (!response.ok) {
+    throw new Error("Failed to fetch photos");
+  }
+  return response.json();
 };
 
 const Index = () => {
