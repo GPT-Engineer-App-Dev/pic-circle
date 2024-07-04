@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 
 const uploadPhoto = async (data) => {
@@ -22,8 +25,8 @@ const uploadPhoto = async (data) => {
 };
 
 const UploadPage = () => {
-  const queryClient = useQueryClient();
   const { register, handleSubmit, reset } = useForm();
+  const queryClient = useQueryClient();
   const [image, setImage] = useState(null);
 
   const mutation = useMutation(uploadPhoto, {
